@@ -1,0 +1,109 @@
+--VISTAS:
+
+CREATE VIEW juzgado_causa
+    SELECT j.nombre, j.apellido, c.n_de_causa
+    FROM juzgado j
+    JOIN causa c
+    ON j.id_juzgado = c.id_juzgado;
+
+CREATE VIEW cliente_causas AS
+	SELECT cl.nombre, cl.apellido, cl.documento, COUNT(*) AS "Cantidad de causas"
+	FROM cliente cl
+    JOIN resuelve r
+    ON cl.id_cliente = r.id_cliente
+	GROUP BY cl.nombre, cl.apellido, cl.documento;
+
+
+--PROCEDIMIENTOS ALMACENADOS:
+
+DELIMITER //
+CREATE PROCEDURE CausaDelCliente(IN nombre char(45), IN apellido char(45))
+	BEGIN 
+    	IF nombre != '' AND apellido != '' THEN
+            SELECT cl.nombre, cl.apellido, c.descripcion 
+            FROM cliente cl
+            JOIN resuelve r ON cl.id_cliente = r.id_cliente
+            JOIN causa c ON r.id_causa = c.id_causa
+            WHERE nombre = cl.nombre AND apellido = cl.apellido;
+        ELSE
+        	SELECT 'No se ha hallado al Cliente';
+        END IF;
+    END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE AbogadoYContraparteDeCausa(IN numero_causa INT(11))
+BEGIN 
+    IF numero_causa IS NOT NULL THEN
+        SELECT c.n_de_causa, a.nombre AS abogado_nombre, a.apellido AS abogado_apellido, 
+               a.matricula AS abogado_matricula, co.nombre AS contraparte_nombre, 
+               co.apellido AS contraparte_apellido, co.matricula AS contraparte_matricula 
+        FROM cliente cl
+        JOIN resuelve r ON cl.id_cliente = r.id_cliente
+        JOIN causa c ON r.id_causa = c.id_causa
+        JOIN asignacion asi ON asi.id_cliente = cl.id_cliente
+        JOIN abogado a ON a.id_abogado = asi.id_abogado
+        JOIN mitiga m ON m.id_cliente = cl.id_cliente
+        JOIN contraparte co ON co.id_contraparte = m.id_contraparte
+        WHERE c.n_de_causa = numero_causa;
+    ELSE
+        SELECT 'No se ha hallado la Causa' AS mensaje;
+    END IF;
+END //
+DELIMITER ;
+
+
+--TRIGGERS:
+
+CREATE TRIGGER InsertarCausa
+AFTER INSERT ON causa
+FOR EACH ROW
+    INSERT INTO auditoriacausas (id_auditoriaCa, id_causa, id_juzgado, n_de_causa, f_de_inicio, f_de_finalizacion, estado, movimiento)
+    VALUES (DEFAULT, NEW.id_causa, NEW.id_juzgado, NEW.n_de_causa, NEW.f_de_inicio, NULL, NEW.estado, 'se ha insertado una causa');
+    
+CREATE TRIGGER EliminarCausa
+AFTER DELETE ON causa
+FOR EACH ROW
+	INSERT INTO auditoriacausas (id_auditoria, id_causa, id_juzgado, n_de_causa, f_de_inicio, f_de_finalizacion, estado, descripcion)
+	VALUES (DEFAULT, OLD.id_causa, OLD.id_juzgado, OLD.n_de_causa, OLD.f_de_inicio, OLD.f_de_finalizacion, OLD.estado, 'se ha eliminado una causa');
+
+
+--FUNCIONES:
+
+DELIMITER //
+CREATE FUNCTION calcular_causa_estado(id_causa INT) 
+RETURNS VARCHAR(20)
+DETERMINISTIC
+BEGIN
+    DECLARE retorno VARCHAR(20);
+
+    SELECT c.estado 
+    INTO retorno
+    FROM causa c
+    WHERE c.id_causa = id_causa;
+
+    IF retorno LIKE '%Sentenciada%' 
+       OR retorno LIKE '%Archivada%' 
+       OR retorno LIKE '%Cumplida%' 
+       OR retorno LIKE '%Desestimada%' THEN
+        RETURN 'Finalizado';
+    ELSE
+        RETURN 'Vigente';
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE FUNCTION especialidad_abogado (matricula varchar(45)) 
+RETURNS varchar(45)
+DETERMINISTIC
+BEGIN
+    DECLARE espe varchar(45);
+    SELECT e.nombre INTO espe
+    FROM especialidad e
+    JOIN abogado a
+    ON a.id_especialidad = e.id_especialidad
+    WHERE a.matricula = matricula;
+    RETURN espe;
+END //
+DELIMITER ;
