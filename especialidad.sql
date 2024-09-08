@@ -1,0 +1,15 @@
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (1, '001', 'Derecho civil');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (2, '002', 'Derecho penal');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (3, '003', 'Derecho laboral');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (4, '004', 'Derecho comercial');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (5, '005', 'Derecho tributario');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (6, '006', 'Derecho administrativo');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (7, '007', 'Derecho familiar');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (8, '008', 'Derecho de propiedad intelectual');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (9, '009', 'Derecho ambiental');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (10, '010', 'Derecho internacional');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (11, '011', 'Derecho de inmigración');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (12, '012', 'Derecho de la salud');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (13, '013', 'Derecho de sucesiones');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (14, '014', 'Derecho bancario y financiero');
+insert into especialidad (id_especialidad, c_especialidad, nombre) values (15, '015', 'Derecho corporativo');
