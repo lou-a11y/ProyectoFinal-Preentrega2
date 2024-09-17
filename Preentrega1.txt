@@ -1,0 +1,104 @@
+CREATE DATABASE IF NOT EXISTS db_estudiojuridico;
+USE db_estudiojuridico;
+
+CREATE TABLE juzgado (
+  	id_juzgado int(11) NOT NULL AUTO_INCREMENT,
+  	nombre varchar(45) DEFAULT NULL,
+	apellido varchar(45) DEFAULT NULL,
+  	direccion varchar(45) DEFAULT NULL, 
+  	telefono varchar(45) DEFAULT NULL,
+  	correo varchar(45) DEFAULT NULL,
+  	PRIMARY KEY(id_juzgado)
+);
+
+CREATE TABLE especialidad(
+  id_especialidad int(11) NOT NULL AUTO_INCREMENT,
+  c_especialidad int(11) DEFAULT NULL,
+  nombre varchar(45) DEFAULT NULL,
+  PRIMARY KEY(id_especialidad)
+);
+
+CREATE TABLE abogado(
+	id_abogado int(11) NOT NULL AUTO_INCREMENT,
+    id_especialidad int(11) DEFAULT NULL,
+    nombre varchar(45) DEFAULT NULL,
+	apellido varchar(45) DEFAULT NULL,
+    matricula varchar(45) DEFAULT NULL,
+    telefono varchar(45) DEFAULT NULL,
+    correo varchar(45) DEFAULT NULL,
+    PRIMARY KEY(id_abogado),
+    FOREIGN KEY(id_especialidad) REFERENCES especialidad(id_especialidad)
+);
+
+CREATE TABLE cliente (
+  	id_cliente int(11) NOT NULL AUTO_INCREMENT,
+  	nombre varchar(45) DEFAULT NULL,
+	apellido varchar(45) DEFAULT NULL,
+  	documento int(11) DEFAULT NULL,
+    direccion varchar(45) DEFAULT NULL,
+    telefono varchar(45) DEFAULT NULL,
+    correo varchar(45) DEFAULT NULL,
+  	PRIMARY KEY(id_cliente)
+);
+
+CREATE TABLE contraparte(
+	id_contraparte int(11) NOT NULL AUTO_INCREMENT,
+    nombre varchar(45) DEFAULT NULL,
+	apellido varchar(45) DEFAULT NULL,
+    matricula varchar(45) DEFAULT NULL,
+    telefono varchar(45) DEFAULT NULL,
+    correo varchar(45) DEFAULT NULL,
+    d_de_estudio varchar(45) DEFAULT NULL,
+    PRIMARY KEY(id_contraparte)
+);
+
+CREATE TABLE causa(
+  	id_causa int(11) NOT NULL AUTO_INCREMENT,
+  	id_juzgado int(11) DEFAULT NULL,
+  	n_de_causa int(11) DEFAULT NULL,
+  	descripcion varchar(70) DEFAULT NULL,
+  	f_de_inicio date DEFAULT NULL,
+  	f_de_finalizacion date DEFAULT NULL,
+  	estado varchar(45) DEFAULT NULL,
+  	PRIMARY KEY(id_causa),
+  	FOREIGN KEY(id_juzgado) REFERENCES juzgado(id_juzgado)
+);
+
+CREATE TABLE asignacion(
+	id_asignacion int(11) NOT NULL AUTO_INCREMENT,
+  	id_cliente int(11) DEFAULT NULL,
+  	id_abogado int(11) DEFAULT NULL,
+  	PRIMARY KEY(id_asignacion),
+    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente),
+	FOREIGN KEY(id_abogado) REFERENCES abogado(id_abogado)
+);
+
+CREATE TABLE mitiga (
+  	id_mitiga int(11) NOT NULL AUTO_INCREMENT,
+  	id_cliente int(11) DEFAULT NULL,
+  	id_contraparte int(11) DEFAULT NULL,
+  	PRIMARY KEY(id_mitiga),
+    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente),
+	FOREIGN KEY(id_contraparte) REFERENCES contraparte(id_contraparte)
+);
+
+CREATE TABLE resuelve(
+	id_resuelve int(11) NOT NULL AUTO_INCREMENT,
+	id_causa int(11) DEFAULT NULL,
+    id_cliente int (11) DEFAULT NULL,
+    PRIMARY KEY(id_resuelve),
+    FOREIGN KEY(id_causa) REFERENCES causa(id_causa),
+    FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente)
+);
+
+CREATE TABLE auditoriaCa(
+	id_auditoriaCa int(11) NOT NULL AUTO_INCREMENT,
+	id_causa int(11) NOT NULL,
+	id_juzgado int(11) NOT NULL,
+	n_de_causa int(11) NOT NULL,
+	f_de_inicio DATE DEFAULT NULL,
+	f_de_finalizacion DATE DEFAULT NULL,
+	estado varchar(45) DEFAULT NULL,
+	movimiento varchar(70) NOT NULL,
+	PRIMARY KEY(id_auditoriaCa)
+);
