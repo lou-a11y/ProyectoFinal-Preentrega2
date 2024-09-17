@@ -1,6 +1,6 @@
 --VISTAS:
 
-CREATE VIEW juzgado_causa
+CREATE VIEW juzgado_causa AS
     SELECT j.nombre, j.apellido, c.n_de_causa
     FROM juzgado j
     JOIN causa c
@@ -72,10 +72,10 @@ FOR EACH ROW
 
 DELIMITER //
 CREATE FUNCTION calcular_causa_estado(id_causa INT) 
-RETURNS VARCHAR(20)
+RETURNS VARCHAR(70)
 DETERMINISTIC
 BEGIN
-    DECLARE retorno VARCHAR(20);
+    DECLARE retorno VARCHAR(70);
 
     SELECT c.estado 
     INTO retorno
@@ -94,16 +94,19 @@ END //
 DELIMITER ;
 
 DELIMITER //
-CREATE FUNCTION especialidad_abogado (matricula varchar(45)) 
+CREATE FUNCTION especialidad_abogado (matricula varchar(45))
 RETURNS varchar(45)
 DETERMINISTIC
 BEGIN
-    DECLARE espe varchar(45);
-    SELECT e.nombre INTO espe
-    FROM especialidad e
-    JOIN abogado a
-    ON a.id_especialidad = e.id_especialidad
-    WHERE a.matricula = matricula;
-    RETURN espe;
+
+   DECLARE espe varchar(45);
+   SELECT e.nombre
+   INTO espe
+   FROM especialidad e
+   JOIN abogado a ON a.id_especialidad = e.id_especialidad
+   WHERE a.matricula = matricula
+   LIMIT 1; -- Asegura que solo se devuelva una fila
+
+   RETURN espe;
 END //
 DELIMITER ;
