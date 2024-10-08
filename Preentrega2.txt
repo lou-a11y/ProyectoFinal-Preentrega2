@@ -13,6 +13,47 @@ CREATE VIEW cliente_causas AS
     ON cl.id_cliente = r.id_cliente
 	GROUP BY cl.nombre, cl.apellido, cl.documento;
 
+CREATE VIEW cliente_abogadoinfo AS
+	SELECT cl.nombre AS nombre_cliente, cl.apellido AS apellido_cliente, 
+           a.nombre AS nombre_abogado, a.apellido AS apellido_abogado, 
+           a.telefono, a.correo
+    FROM cliente cl
+    JOIN asignacion asi
+        ON asi.id_cliente = cl.id_cliente
+    JOIN abogado a
+        ON asi.id_abogado = a.id_abogado;
+
+CREATE VIEW abogado_juzgado_contraparte AS
+    SELECT j.nombre AS juzgado_nombre, j.apellido AS juzgado_apellido, 
+           j.correo AS juzgado_correo, j.telefono AS juzgado_telefono, 
+           a.nombre AS abogado_nombre, a.apellido AS abogado_apellido, 
+           a.correo AS abogado_correo, a.telefono AS abogado_telefono, 
+           c.nombre AS contraparte_nombre, c.apellido AS contraparte_apellido, 
+           c.correo AS contraparte_correo, c.telefono AS contraparte_telefono
+    FROM juzgado j
+    JOIN causa ca
+        ON ca.id_juzgado = j.id_juzgado
+    JOIN resuelve r
+        ON r.id_causa = ca.id_causa
+    JOIN cliente cl
+        ON cl.id_cliente = r.id_cliente
+    JOIN mitiga m
+        ON m.id_cliente = cl.id_cliente
+    JOIN contraparte c
+        ON c.id_contraparte = m.id_contraparte
+    JOIN asignacion asi
+        ON asi.id_cliente = cl.id_cliente
+    JOIN abogado a
+        ON asi.id_abogado = a.id_abogado;
+
+CREATE VIEW clienteInfo AS
+	SELECT cl.nombre, cl.apellido, cl.direccion, cl.telefono, c.descripcion
+    FROM cliente cl
+    JOIN resuelve r
+    ON r.id_cliente = cl.id_cliente
+    JOIN causa c
+    ON c.id_causa = r.id_causa;
+
 
 --PROCEDIMIENTOS ALMACENADOS:
 
@@ -64,7 +105,7 @@ FOR EACH ROW
 CREATE TRIGGER EliminarCausa
 AFTER DELETE ON causa
 FOR EACH ROW
-	INSERT INTO auditoriacausas (id_auditoria, id_causa, id_juzgado, n_de_causa, f_de_inicio, f_de_finalizacion, estado, descripcion)
+	INSERT INTO auditoriacausas (id_auditoriaCa, id_causa, id_juzgado, n_de_causa, f_de_inicio, f_de_finalizacion, estado, descripcion)
 	VALUES (DEFAULT, OLD.id_causa, OLD.id_juzgado, OLD.n_de_causa, OLD.f_de_inicio, OLD.f_de_finalizacion, OLD.estado, 'se ha eliminado una causa');
 
 
@@ -110,3 +151,4 @@ BEGIN
    RETURN espe;
 END //
 DELIMITER ;
+
